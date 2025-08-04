@@ -25,7 +25,60 @@ model Turma {
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  // unidadesCurriculares UnidadeCurricular[]
+  unidadesCurriculares UnidadeCurricular[]
 
   @@map("turmas")
+}
+
+model UnidadeCurricular {
+  id           String  @id @default(cuid())
+  nome         String
+  codigo       String? // Ex: "MAT001", "POR102"
+  descricao    String?
+  cargaHoraria Int?
+  professor    String?
+  cor          String? // Para personalizar a cor do card
+  ordem        Int     @default(0) // Para ordenar as UCs na tela
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  turmaId String
+  turma   Turma  @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  aulas   Aula[]
+
+  @@map("unidades_curriculares")
+}
+
+model Aula {
+  id            String     @id @default(cuid())
+  titulo        String
+  resumo        String?
+  dataAula      DateTime
+  status        StatusAula @default(PLANEJADA)
+  duracao       Int? // em minutos
+  assunto       String
+  objetivos     String? // Objetivos da aula
+  materialApoio String? // Links ou descrição de materiais
+  observacoes   String?
+  ordem         Int        @default(0) // Para ordenar as aulas
+  slug          String? // Para páginas estáticas específicas
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  unidadeCurricularId String
+  unidadeCurricular   UnidadeCurricular @relation(fields: [unidadeCurricularId], references: [id], onDelete: Cascade)
+
+  @@map("aulas")
+}
+
+enum StatusAula {
+  PLANEJADA
+  EM_ANDAMENTO
+  CONCLUIDA
+  CANCELADA
+  ADIADA
 }
